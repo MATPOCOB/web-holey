@@ -26,13 +26,7 @@ public class HoleySQLController {
   @Autowired
   JdbcTemplate jdbcTemplate;
 
-  @RequestMapping(value = "/sql/search", method = GET)
-  public String index(Model model, @RequestParam(required = false) String query) {
-    model.addAttribute("query", query);
-    return "/sql/search";
-  }
-
-  @RequestMapping(value = "/sql/search", method = POST)
+  @RequestMapping(value = "/sql/search")
   public String search(Model model, @RequestParam(required = false) String query) {
     model.addAttribute("query", query);
     model.addAttribute("products", findProducts(query));
