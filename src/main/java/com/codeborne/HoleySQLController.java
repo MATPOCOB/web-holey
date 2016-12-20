@@ -1,9 +1,11 @@
 package com.codeborne;
 
 import com.codeborne.models.Product;
+import jdk.nashorn.internal.ir.RuntimeNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -30,6 +34,7 @@ public class HoleySQLController {
   public String search(Model model, @RequestParam(required = false) String query) {
     model.addAttribute("query", query);
     model.addAttribute("products", findProducts(query));
+//    model.addAttribute("products", findProductsSafe(query));
     return "/sql/search";
   }
 
@@ -40,5 +45,19 @@ public class HoleySQLController {
                 .setName(rs.getString("name"))
                 .setPrice(new BigDecimal(rs.getString("price")))
     );
+  }
+
+  public List<Product> findProductsSafe(String query) {
+    PreparedStatementCreator creator = con -> {
+      PreparedStatement updateSales = con.prepareStatement(
+          "SELECT * FROM products WHERE name like ?");
+      updateSales.setString(1, "%"+query+"%");
+      return updateSales;
+    };
+
+    return jdbcTemplate.query(creator, (rs, rowNum) ->
+        new Product().setId(rs.getLong("id"))
+            .setName(rs.getString("name"))
+            .setPrice(new BigDecimal(rs.getString("price"))));
   }
 }

