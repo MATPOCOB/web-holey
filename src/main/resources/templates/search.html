@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>XSS demo</title>
-</head>
-<body>
-  <div>
-    <form action="search" method="post">
-      Search for: <input type="text" name="query" value="${query!}">
-    </form>
-  </div>
-  <#if (query??)>
-    <br>
-    <div>No results matching: ${query} </div>
-  </#if>
-</body>
+  <head>
+    <meta charset="utf-8">
+    <title>XSS demo</title>
+  </head>
+  <body>
+    <div>
+      <form action="search" method="post">
+        Search for: <input type="text" name="query" value="${query!}">
+      </form>
+    </div>
+    <#if (query??)>
+      <br>
+      <div>No results matching: ${query} </div>
+    </#if>
+  </body>
 </html>

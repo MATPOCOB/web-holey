@@ -1,29 +1,29 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>SQL injection demo - SELECT</title>
-</head>
-<body>
-  <div>
-    <form action="/sql/search" method="post">
-      Search for: <input type="text" name="query" value="${query!}" style="width: 100%">
-    </form>
-  </div>
-  <br>
-  <#if query?has_content>
-    <table border="1" width="100%">
-      <thead><tr><th>Name</th><th>Price</th></tr></thead>
-      <#list (products!) as product>
-        <tbody><tr><td>${(product.name)!}</td><td>${(product.price)!}</td></tr></tbody>
-      </#list>
-    </table>
+  <head>
+    <meta charset="utf-8">
+    <title>SQL injection demo - SELECT</title>
+  </head>
+  <body>
+    <div>
+      <form action="/sql/search" method="post">
+        Search for: <input type="text" name="query" value="${query!}" style="width: 100%">
+      </form>
+    </div>
     <br>
-    <#if !(products?has_content)>
-      <div>No results matching: ${query} </div>
-    <#else>
-      <div>${products?size} items match: ${query}</div>
+    <#if query?has_content>
+      <table border="1" width="100%">
+        <thead><tr><th>Name</th><th>Price</th></tr></thead>
+        <#list (products!) as product>
+          <tbody><tr><td>${(product.name)!}</td><td>${(product.price)!}</td></tr></tbody>
+        </#list>
+      </table>
+      <br>
+      <#if !(products?has_content)>
+        <div>No results matching: ${query} </div>
+      <#else>
+        <div>${products?size} items match: ${query}</div>
+      </#if>
     </#if>
-  </#if>
-</body>
+  </body>
 </html>
