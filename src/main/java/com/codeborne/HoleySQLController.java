@@ -1,28 +1,17 @@
 package com.codeborne;
 
 import com.codeborne.models.Product;
-import jdk.nashorn.internal.ir.RuntimeNode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.sql.DataSource;
 import java.math.BigDecimal;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
-
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @Controller
 public class HoleySQLController {
@@ -59,5 +48,26 @@ public class HoleySQLController {
         new Product().setId(rs.getLong("id"))
             .setName(rs.getString("name"))
             .setPrice(new BigDecimal(rs.getString("price"))));
+  }
+
+  public List<Product> listProducts(String orderBy) {
+    PreparedStatementCreator creator = con -> {
+      PreparedStatement updateSales = con.prepareStatement(
+          "SELECT * FROM products ORDER BY " + orderBy);
+      return updateSales;
+    };
+
+    return jdbcTemplate.query(creator, (rs, rowNum) ->
+        new Product().setId(rs.getLong("id"))
+            .setName(rs.getString("name"))
+            .setPrice(new BigDecimal(rs.getString("price"))));
+  }
+
+  @RequestMapping(value = "/sql/list")
+  public String list(Model model, @RequestParam(defaultValue = "name", required = false) String orderBy) {
+    model.addAttribute("products", listProducts(orderBy));
+    model.addAttribute("orderBy", orderBy);
+    System.out.println(orderBy);
+    return "/sql/list";
   }
 }
