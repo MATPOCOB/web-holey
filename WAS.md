@@ -19,7 +19,7 @@ Should accept only relevant parameters
 ## Input Data
 Whole HTTP request including headers, imported files, file names etc.
 
-DEMO: if Apache access logs are publicly visible, then it is possible to inject JS via User-Agent
+TODO: if Apache access logs are publicly visible, then it is possible to inject JS via User-Agent
 
 ## Input Data Validation
 1. Client-side - usability
@@ -131,6 +131,14 @@ SELECT * FROM INFORMATION_SCHEMA.COLUMNS
 
 #### Read files
 `' UNION SELECT 1,LOAD_FILE('/etc/passwd'),3 #`
+
+DEFENCE: 
+
+- do not use `root` MySQL database user with access to all files in your machine
+- avoid `GRANT ALL PRIVILEGES` as it contains `FILE` privilege
+
+> FILE - Enable the user to cause the server to read or write files. Level: Global.`
+http://dev.mysql.com/doc/refman/5.7/en/grant.html
 
 #### DEFENCE - Prepared statements
 
